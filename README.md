@@ -1,54 +1,131 @@
-## GitOps with Jenkins and ArgoCD
+# GitOps with Jenkins and ArgoCD
 
 This repository demonstrates a GitOps workflow using Jenkins Container and ArgoCD to deploy Kubernetes manifests to a Minikube cluster running on a Container. The project integrates Jenkins CI/CD with ArgoCD to enable automated deployments whenever changes are pushed to the GitHub repository.
 
-### Project Overview
+## Project Overview
 
-Jenkins: Runs as a container outside the Minikube cluster to handle CI/CD tasks.
+- **Jenkins**: Runs as a container outside the Minikube cluster to handle CI/CD tasks
+- **Minikube**: Serves as the Kubernetes cluster, with Docker as the driver
+- **ArgoCD**: Manages the continuous deployment of Kubernetes manifests
+- **GitHub Webhooks**: Triggers the Jenkins pipeline upon git push events
+- **Infrastructure**: Terraform configurations for provisioning AWS EC2 instances
+- **Application**: Node.js application with Docker containerization
 
-Minikube: Serves as the Kubernetes cluster, with Docker as the driver.
+## Repository Structure
 
-ArgoCD: Manages the continuous deployment of Kubernetes manifests.
+```
+.
+├── README.md
+├── code/                  # Application source code
+│   ├── Dockerfile        # Container image definition
+│   ├── app.js           # Node.js application
+│   ├── package.json     # Node.js dependencies
+│   └── public/          # Static assets
+├── infra/               # Infrastructure configurations
+│   ├── Jenkinsfile      # Jenkins pipeline definition
+│   └── manifests/       # Kubernetes manifests
+└── terraform/           # Terraform configurations for AWS resources
+```
 
-GitHub Webhooks: Triggers the Jenkins pipeline upon git push events.
+## Architecture
 
-Manifests Directory: Contains Kubernetes YAML files for deployment, located in the manifests directory of this repository.
+1. **Source Control**:
+   - Git Push triggers GitHub webhook
+   - Repository contains application code, K8s manifests, and infrastructure as code
 
+2. **CI/CD Pipeline**:
+   - Jenkins fetches updated repository
+   - Builds and tests application
+   - Interacts with ArgoCD for deployment
+   - Updates infrastructure using Terraform when needed
 
-### Architecture
+3. **Infrastructure**:
+   - EC2 instances provisioned via Terraform
+   - Minikube cluster running on EC2
+   - ArgoCD syncs manifests with the cluster
 
-Git Push: Changes to the repository trigger a GitHub webhook.
+4. **Deployment Flow**:
+   - ArgoCD ensures cluster state matches repository configuration
+   - Continuous monitoring and automatic sync of changes
 
-Jenkins Pipeline: Jenkins fetches the updated repository and interacts with ArgoCD to deploy the manifests.
+## Prerequisites
 
-ArgoCD: Syncs the manifests with the Minikube cluster, ensuring the cluster state matches the desired configuration.
+### Tools Required
+- Docker
+- Minikube
+- Jenkins
+- ArgoCD CLI
+- Git
+- Terraform
+- AWS CLI
 
+### AWS Configuration
+- AWS account with appropriate permissions
+- AWS credentials configured locally
+- EC2 key pair for instance access
 
-### Prerequisites
+## Setup Instructions
 
-#### Tools
+1. **Infrastructure Setup**:
+   ```bash
+   cd terraform
+   terraform init
+   terraform plan
+   terraform apply
+   ```
 
-Docker
+2. **Minikube Configuration**:
+   ```bash
+   minikube start --driver=docker
+   ```
 
-Minikube
+3. **Jenkins Setup**:
+   - Run Jenkins container
+   - Configure GitHub webhook
+   - Set up necessary credentials
 
-Jenkins
+4. **ArgoCD Installation**:
+   ```bash
+   kubectl create namespace argocd
+   kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+   ```
 
-ArgoCD CLI
+5. **Application Deployment**:
+   ```bash
+   cd code
+   docker build -t your-app:latest .
+   ```
 
-Git
+## Usage
 
+1. Make changes to your application code or Kubernetes manifests
+2. Commit and push changes to GitHub
+3. Jenkins pipeline will automatically trigger
+4. ArgoCD will sync the changes to the cluster
 
-#### Setup
+## Infrastructure Management
 
-A GitHub repository with Kubernetes manifest files in a manifests directory.
+The Terraform configurations in the `terraform/` directory manage:
+- EC2 instance provisioning
+- Security group configuration
+- Network settings
+- Any additional AWS resources needed
 
-A Minikube cluster with Docker as the driver.
+## Monitoring and Maintenance
 
-A Jenkins container running outside the Minikube cluster.
+- Access ArgoCD UI for deployment status
+- Monitor Jenkins pipeline executions
+- Check EC2 instance health via AWS Console
+- Review application logs through kubectl
 
-ArgoCD installed and configured in the Minikube cluster.
+## Contributing
 
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
+## License
 
-
+This project is licensed under the MIT License - see the LICENSE file for details.
