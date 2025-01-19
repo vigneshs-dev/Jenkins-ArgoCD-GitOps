@@ -26,7 +26,7 @@ docker-compose.override.yml
 
 # Kubernetes-related files
 kubectl
-**/manifests/
+# **/manifests/
 
 # Build output (if any)
 dist/
@@ -42,3 +42,19 @@ coverage/
 .idea/
 *.swp
 *.swo
+
+# Terraform files
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+crash.log
+*.tfplan
+*.tfplan.zip
+.terraformrc
+/infra/terraform/terraform-keypair.pem
